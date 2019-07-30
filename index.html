@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+	</head>
+	<body>
+		<h1>Student Controller System</h1>
+		<hr />
+		<hr />
+		<br /><br />
+		Name : <input type="text" name="" id="stdName" required /><br /><br />
+		Roll No : <input type="number" name="" id="stdRoll" required /><br /><br />
+		age : <input type="number" name="" id="stdAge" required /><br /><br />
+		<input type="submit" id="sub" value="Add Record" />
+
+		<hr />
+		<div id="searchdiv">
+			search by Roll no : <input type="number" name="" id="stdRollNo" id="serchNo" />
+			<input type="button" value="Search" id="serchbtn" />
+			<h2>search result</h2>
+			<!-- <label for="" id="lblName">basit</label>
+			<label for="" id="lblName">01</label> , <label for="" id="lblName">19</label>
+			<input type="button" value="Delete" /> -->
+		</div>
+		<hr />
+		<div style="border: 2px solid red;" id="recordDiv">
+			<br />
+			<!-- <br /><br /><br />
+
+			<label for="" id="lblName">basit</label>
+			<label for="" id="lblName">01</label> , <label for="" id="lblName">19</label>
+			<input type="button" value="Delete" /> -->
+		</div>
+
+		<script>
+			var modalController = (function() {
+				// var Student = function(name, rollno, age) {
+				// 	this.name = name;
+				// 	this.rollno = rollno;
+				// 	this.age = age;
+				// };
+				var data = {
+					name: [],
+					rollNo: [],
+					age: [],
+				};
+
+				return {
+					addStudent: function(na, rolNo, ag) {
+						data['name'].push(na);
+						data['rollNo'].push(rolNo);
+						data['age'].push(ag);
+					},
+					testingC: function() {
+						return data;
+					},
+					deleteItem: function(rollnumber) {
+						var ids, index;
+						ids = data['rollNo'].map(function(current) {
+							return current;
+						});
+						//						console.log(ids);
+						index = ids.indexOf(rollnumber);
+
+						if (index !== -1) {
+							data['name'].splice(index, 1);
+							data['rollNo'].splice(index, 1);
+							data['age'].splice(index, 1);
+						}
+					},
+				};
+			})();
+
+			var UIController = (function() {
+				var ElementsIds = {
+					txtname: 'stdName',
+					txtroll: 'stdRoll',
+					txtage: 'stdAge',
+					subbtn: 'sub',
+					btnsearch: 'serchNo',
+					txtrollno: 'stdRollNo',
+					rollsearch: 'serchbtn',
+					divrecord: 'recordDiv',
+					seadiv: 'searchdiv',
+				};
+				return {
+					elemntids: ElementsIds,
+					additem: function(name, roll, age, type) {
+						var html, newhtml;
+						html =
+							'<div id="del-%id%"><label>NAME : %name%</label> , <label>ROLL No : %01%</label> , <label>AGE : %age%</label> <div> <input type="button" value="Delete" /><div/><div/><br/>';
+						newhtml = html.replace('%name%', name);
+						newhtml = newhtml.replace('%01%', roll);
+						newhtml = newhtml.replace('%id%', roll);
+						newhtml = newhtml.replace('%age%', age);
+						if (type === ElementsIds.divrecord) {
+							document.getElementById(ElementsIds.divrecord).insertAdjacentHTML('beforeend', newhtml);
+						} else {
+							document.getElementById(ElementsIds.seadiv).insertAdjacentHTML('beforeend', newhtml);
+						}
+					},
+				};
+				// document.getElementById();
+			})();
+
+			var Controller = (function(modelctlr, Uictlr) {
+				var id, name, roll, age;
+				id = Uictlr.elemntids;
+
+				document.getElementById(id.subbtn).addEventListener('click', () => {
+					name = document.getElementById(id.txtname);
+					roll = document.getElementById(id.txtroll);
+					age = document.getElementById(id.txtage);
+					modelctlr.addStudent(name.value, parseInt(roll.value), parseInt(age.value));
+					Uictlr.additem(name.value, parseInt(roll.value), parseInt(age.value), id.divrecord);
+					name.value = '';
+					roll.value = '';
+					age.value = '';
+				});
+				var delItem = function(event) {
+					var id, splitId, actid, el;
+					id = event.target.parentNode.parentNode.id;
+					el = document.getElementById(id);
+					el.parentNode.removeChild(el);
+					//	console.log(id);
+					if (id) {
+						splitId = id.split('-');
+						actid = parseInt(splitId[1]);
+						//						console.log(actid + ' id');
+						modelctlr.deleteItem(actid);
+					}
+				};
+
+				document.getElementById(id.divrecord).addEventListener('click', delItem);
+				document.getElementById(id.rollsearch).addEventListener('click', () => {
+					var searchvalue, _index, i;
+					searchvalue = parseInt(document.getElementById(id.txtrollno).value);
+					_index = modelctlr.testingC().rollNo[modelctlr.testingC().rollNo.indexOf(searchvalue)];
+					_index == undefined ? -1 : _index;
+					//console.log(_index);
+					if (_index == undefined) {
+						alert('Sorry ! Roll No is not registered in record');
+						document.getElementById(id.txtrollno).value = '';
+					} else {
+						i = modelctlr.testingC().rollNo.indexOf(_index);
+						// console.log(
+						// 	modelctlr.testingC().name[i] +
+						// 		' ' +
+						// 		modelctlr.testingC().rollNo[i] +
+						// 		' ' +
+						// 		modelctlr.testingC().age[i]
+						// );
+						Uictlr.additem(
+							modelctlr.testingC().name[i],
+							modelctlr.testingC().rollNo[i],
+							modelctlr.testingC().age[i],
+							id.seadiv
+						);
+
+						document.getElementById(id.txtrollno).value = '';
+					}
+				});
+			})(modalController, UIController);
+		</script>
+	</body>
+</html>
